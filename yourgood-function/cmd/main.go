@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"youRgood/twitter"
+	"youRgood/fox"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,7 +18,7 @@ func getPort() string {
 
 func main() {
 	r := gin.Default()
-	r.POST("/twitter", twitter.Handler)
+	r.POST("/fox", fox.Handler)
 	r.NoRoute(func(c *gin.Context) {
 		c.JSON(404, gin.H{"code": "PAGE_NOT_FOUND", "message": "Page not found."})
 	})

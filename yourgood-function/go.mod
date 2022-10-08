@@ -6,10 +6,12 @@ require (
 	github.com/dghubble/oauth1 v0.7.1
 	github.com/drswork/go-twitter v0.0.0-20220710160938-983ef38dcd50
 	github.com/gin-gonic/gin v1.8.1
+	github.com/microsoft/ApplicationInsights-Go v0.4.4
 	gopkg.in/yaml.v2 v2.4.0
 )
 
 require (
+	code.cloudfoundry.org/clock v0.0.0-20180518195852-02e53af36e6c // indirect
 	github.com/cenkalti/backoff/v4 v4.1.3 // indirect
 	github.com/dghubble/sling v1.4.0 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
@@ -17,6 +19,7 @@ require (
 	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/go-playground/validator/v10 v10.10.0 // indirect
 	github.com/goccy/go-json v0.9.7 // indirect
+	github.com/gofrs/uuid v3.3.0+incompatible // indirect
 	github.com/google/go-cmp v0.5.8 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
