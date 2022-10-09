@@ -1,2 +1,11 @@
 users:
   - "@Enviy777"
+
+twitter:
+  key: "TWT_CONSUMER_KEY"
+  key_secret: "TWT_CONSUMER_SECRET"
+  token: "TWT_ACCESS_TOKEN"
+  token_secret: "TWT_ACCESS_TOKEN_SECRET"
+
+azure:
+  insights_key: "APPINSIGHTS_INSTRUMENTATIONKEY"
