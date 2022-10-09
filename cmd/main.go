@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"youRgood/fox"
+	"aviary/fox"
 
 	"github.com/gin-gonic/gin"
 )

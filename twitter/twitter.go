@@ -1,7 +1,7 @@
 package twitter
 
 import (
-	"youRgood/config"
+	"aviary/config"
 
 	twt "github.com/drswork/go-twitter/twitter"
 )

@@ -7,8 +7,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"youRgood/insights"
-	"youRgood/twitter"
+	"aviary/insights"
+	"aviary/twitter"
 
 	"github.com/gin-gonic/gin"
 )
