@@ -2,21 +2,18 @@ package insights
 
 import (
 	"fmt"
-	"os"
+
+	"aviary/config"
 
 	"github.com/microsoft/ApplicationInsights-Go/appinsights"
-)
-
-const (
-	envName = "APPINSIGHTS_INSTRUMENTATIONKEY"
 )
 
 type Logger struct {
 	InsightsClient appinsights.TelemetryClient
 }
 
-func New() *Logger {
-	client := appinsights.NewTelemetryClient(os.Getenv(envName))
+func New(prov config.Provider) *Logger {
+	client := appinsights.NewTelemetryClient(prov.Azure.InsightsKey)
 	return &Logger{
 		InsightsClient: client,
 	}

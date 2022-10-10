@@ -3,22 +3,20 @@ package twitter
 import (
 	"aviary/config"
 
+	"github.com/dghubble/oauth1"
 	twt "github.com/drswork/go-twitter/twitter"
 )
 
 type Gateway struct {
-	Provider config.Provider
-	Session  *twt.Client
+	Session *twt.Client
 }
 
-func New() (*Gateway, error) {
-	provider, err := config.New()
-	if err != nil {
-		return nil, err
-	}
+func New(prov config.Provider) (*Gateway, error) {
+	cfg := oauth1.NewConfig(prov.Twitter.Key, prov.Twitter.KeySecret)
+	token := oauth1.NewToken(prov.Twitter.Token, prov.Twitter.TokenSecret)
+	httpClient := cfg.Client(oauth1.NoContext, token)
 	return &Gateway{
-		Provider: provider,
-		Session:  twt.NewClient(provider.Client),
+		Session: twt.NewClient(httpClient),
 	}, nil
 }
 

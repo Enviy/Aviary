@@ -7,37 +7,41 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"aviary/insights"
-	"aviary/twitter"
+	"aviary/app"
 
 	"github.com/gin-gonic/gin"
 )
 
 type client struct {
-	Twitter *twitter.Gateway
-	Logger  *insights.Logger
+	App     app.Gateway
 	MediaID int64
 	Content []byte
 }
 
+// Handler behaves more like a controller,
+// it's the entry point for package's business logic.
 func Handler(c *gin.Context) {
-	logger := insights.New()
-	gateway, err := twitter.New()
+	app, err := app.New()
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, "unable to setup")
-		logger.Error("twitter.New: error", err)
 		return
 	}
-	// Build client for handler workflow.
+	// Using client pointer to share data among methods.
 	client := &client{
-		Twitter: gateway,
-		Logger:  logger,
+		App: app,
 	}
-	for _, user := range client.Twitter.Provider.Users {
-		err = client.sendTweet(user)
+	for _, user := range app.Users {
+		err = client.getFox()
 		if err != nil {
-			c.JSON(http.StatusBadRequest, "unable to tweet")
-			// Not logging this error due to already existing error logging.
+			app.Logger.Error("getFox: error", err)
+			c.JSON(http.StatusUnauthorized, "unable to get fox")
+			return
+		}
+		message := fmt.Sprintf("You're good! %s", user)
+		err = client.App.Twitter.SendTweet(message, []int64{client.MediaID})
+		if err != nil {
+			app.Logger.Error("SendTweet: error", err)
+			c.JSON(http.StatusUnauthorized, "unable to tweet")
 			return
 		}
 	}
@@ -45,33 +49,17 @@ func Handler(c *gin.Context) {
 	return
 }
 
-// sendTweet builds opts and sends tweet.
-func (c *client) sendTweet(user string) error {
-	err := c.getFox()
-	if err != nil {
-		c.Logger.Error("getFox: error", err)
-		return err
-	}
-	message := fmt.Sprintf("You're good! %s", user)
-	err = c.Twitter.SendTweet(message, []int64{c.MediaID})
-	if err != nil {
-		c.Logger.Error("SendTweet: error", err)
-		return err
-	}
-	return nil
-}
-
 // getFox collects fox image, MediaID; stores to pointer.
 func (c *client) getFox() error {
 	resp, err := http.Get("https://randomfox.ca/floof")
 	if err != nil || resp.StatusCode != 200 {
 		errMessage := fmt.Sprintf("http.Get error, status code: %v", resp.StatusCode)
-		c.Logger.Error(errMessage, err)
+		c.App.Logger.Error(errMessage, err)
 		return err
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		c.Logger.Error("io.ReadAll: error", err)
+		c.App.Logger.Error("io.ReadAll: error", err)
 		return err
 	}
 	resp.Body.Close()
@@ -79,21 +67,21 @@ func (c *client) getFox() error {
 	var foxMap map[string]string
 	err = json.Unmarshal(body, &foxMap)
 	if err != nil {
-		c.Logger.Error("json.Unmarshal: error", err)
+		c.App.Logger.Error("json.Unmarshal: error", err)
 		return err
 	}
 
 	// get image content
 	err = c.getContent(foxMap["image"])
 	if err != nil {
-		c.Logger.Error("getContent: error", err)
+		c.App.Logger.Error("getContent: error", err)
 		return err
 	}
 
 	// Get twitter media ID
-	media, _, err := c.Twitter.Session.Media.Upload(c.Content, "image/jpeg")
+	media, _, err := c.App.Twitter.Session.Media.Upload(c.Content, "image/jpeg")
 	if err != nil {
-		c.Logger.Error("Media.Upload: error", err)
+		c.App.Logger.Error("Media.Upload: error", err)
 		return err
 	}
 	c.MediaID = media.MediaID
@@ -105,13 +93,13 @@ func (c *client) getContent(url string) error {
 	resp, err := http.Get(url)
 	if err != nil || resp.StatusCode != 200 {
 		errMessage := fmt.Sprintf("http.Get error, status code: %v", resp.StatusCode)
-		c.Logger.Error(errMessage, err)
+		c.App.Logger.Error(errMessage, err)
 		return err
 	}
 	defer resp.Body.Close()
 	content, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		c.Logger.Error("ioutil.ReadAll: error", err)
+		c.App.Logger.Error("ioutil.ReadAll: error", err)
 		return err
 	}
 	c.Content = content

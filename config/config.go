@@ -2,10 +2,8 @@ package config
 
 import (
 	_ "embed"
-	"net/http"
 	"os"
 
-	"github.com/dghubble/oauth1"
 	"gopkg.in/yaml.v2"
 )
 
@@ -19,18 +17,17 @@ func New() (Provider, error) {
 	if err != nil {
 		return prov, err
 	}
-	// os is used intead of commiting credentials to config file.
-	cfg := oauth1.NewConfig(os.Getenv(prov.Twitter.Key), os.Getenv(prov.Twitter.KeySecret))
-	token := oauth1.NewToken(os.Getenv(prov.Twitter.Token), os.Getenv(prov.Twitter.TokenSecret))
-	// http.Client should auto authorize reqs
-	httpClient := cfg.Client(oauth1.NoContext, token)
-	prov.Client = httpClient
+	// Credentials configured in Function App Configuration
+	// is used instead of KeyVault.
+	prov.Twitter.Key = os.Getenv(prov.Twitter.Key)
+	prov.Twitter.KeySecret = os.Getenv(prov.Twitter.KeySecret)
+	prov.Twitter.Token = os.Getenv(prov.Twitter.Token)
+	prov.Twitter.TokenSecret = os.Getenv(prov.Twitter.TokenSecret)
 	return prov, nil
 }
 
 // Provider defines the aviary config.
 type Provider struct {
-	Client  *http.Client
 	Users   []string `yaml:"users"`
 	Twitter Twitter  `yaml:"twitter"`
 	Azure   Azure    `yaml:"azure"`
