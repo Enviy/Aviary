@@ -17,8 +17,13 @@
 
 Azure Function App for interacting with Twitter.
 
+Note:
+- This project assumes you have an Azure Function App.
+- This project assumes you have a registered Twitter app.
+
 Use:
 - Review and update parameters in config.yaml.
+- Review and update function parameters in Make file.
 - Build using <pre>make build</pre>
 - Deploy using <pre>make deploy</pre>
 
